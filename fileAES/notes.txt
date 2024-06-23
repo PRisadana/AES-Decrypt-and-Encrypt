@@ -1,0 +1,61 @@
+- Alur Kerja Program
+# Memilih File:
+Pengguna memilih file yang akan dienkripsi atau didekripsi.
+
+# Memasukkan Kunci:
+Pengguna memasukkan kunci enkripsi yang valid (16, 24, atau 32 byte).
+
+# Memproses File:
+Program membaca data dari file, mengenkripsi atau mendekripsinya, dan menyimpannya kembali.
+
+# Antarmuka Pengguna:
+Menggunakan antarmuka grafis yang sederhana untuk memudahkan pengguna dalam memilih file dan memasukkan kunci.
+
+- Alasan Panjang Kunci Harus 16, 24, atau 32 Byte
+AES (Advanced Encryption Standard) mendukung tiga ukuran kunci yang berbeda:
+128-bit (16 byte)
+192-bit (24 byte)
+256-bit (32 byte)
+
+- Ukuran kunci ini mempengaruhi tingkat keamanan dan kinerja algoritma:
+128-bit: Keamanan yang cukup untuk sebagian besar aplikasi, performa lebih cepat.
+192-bit: Keamanan lebih tinggi dibanding 128-bit, sedikit lebih lambat.
+256-bit: Keamanan tertinggi, performa paling lambat.
+
+-Validasi bahwa kunci enkripsi harus memiliki panjang 16, 24, atau 32 byte bukan terkait dengan padding data plaintext.
+Padding pada data diperlukan untuk memastikan bahwa ukuran data sesuai dengan ukuran blok AES (128-bit atau 16 byte).
+Namun, panjang kunci (key length) dalam AES memiliki peran yang berbeda dan spesifik.
+
+- Alasan Panjang Kunci Harus 16, 24, atau 32 Byte
+# Spesifikasi AES:
+AES-128: Menggunakan kunci 128-bit (16 byte).
+AES-192: Menggunakan kunci 192-bit (24 byte).
+AES-256: Menggunakan kunci 256-bit (32 byte).
+Standar AES, yang ditetapkan oleh National Institute of Standards and Technology (NIST), mendefinisikan tiga panjang kunci ini.
+Algoritma AES dirancang untuk bekerja dengan panjang kunci tertentu dan tidak mendukung panjang kunci lain.
+
+# Keamanan Kriptografis:
+Panjang kunci yang lebih panjang menyediakan tingkat keamanan yang lebih tinggi.
+Misalnya, kunci 256-bit memberikan keamanan yang jauh lebih kuat dibandingkan kunci 128-bit karena jumlah
+kemungkinan kombinasi kunci meningkat secara eksponensial.
+Panjang kunci yang tidak sesuai dengan 16, 24, atau 32 byte tidak akan dapat memberikan keamanan yang sesuai
+dan tidak akan kompatibel dengan implementasi standar AES.
+
+# Implementasi Algoritma:
+Algoritma AES memerlukan kunci yang memiliki panjang tetap dan standar agar proses enkripsi dan dekripsi dapat dijalankan dengan benar.
+Penggunaan panjang kunci yang tidak sesuai dengan standar akan menyebabkan kesalahan dan tidak dapat menghasilkan hasil enkripsi atau dekripsi yang benar.
+Padding pada Data
+Padding digunakan untuk memastikan bahwa plaintext memiliki panjang yang sesuai dengan ukuran blok AES (16 byte). Padding dilakukan pada data yang akan dienkripsi, bukan pada kunci enkripsi. Kunci enkripsi harus sudah memiliki panjang yang sesuai dengan standar sebelum digunakan dalam algoritma AES.
+
+- Kesimpulan
+Validasi panjang kunci diperlukan karena:
+# Panjang kunci merupakan bagian dari spesifikasi AES dan harus 16, 24, atau 32 byte untuk dapat digunakan dengan benar
+dalam algoritma AES.
+
+# Padding yang diterapkan pada data plaintext tidak berhubungan dengan panjang kunci.
+Padding hanya memastikan bahwa data yang akan dienkripsi memiliki panjang yang sesuai dengan ukuran blok,
+sedangkan panjang kunci harus sesuai dengan standar AES untuk memastikan keamanan dan kompatibilitas algoritma.
+
+- Jadi, meskipun data dapat dipadkan untuk memenuhi ukuran blok yang diperlukan,
+panjang kunci tetap harus divalidasi sesuai dengan standar AES untuk memastikan operasi enkripsi dan dekripsi
+yang aman dan benar.
