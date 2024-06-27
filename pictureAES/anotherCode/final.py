@@ -18,6 +18,7 @@ from Crypto.Cipher import AES
 import hashlib
 import binascii
 import numpy as np
+import time
 
 
 global password 
@@ -131,12 +132,14 @@ def construct_enc_image(ciphertext, relength, width, height):
     encim.save("visual_encrypt.jpeg")
 
 # ------------------------- Visual-encryption -------------------------#
-# Melakukan enkripsi visual pada gambar dan menyimpannya dalam bentuk ciphertext.
-def encrypt(imagename, password):
+# ------------------------ Encryption -------------------#
+def encrypt(imagename, password, time_label, image_info_label):
+    start_time = time.time()  # Pencatatan waktu mulai
+
     plaintext = list()
     plaintextstr = ""
 
-    im = Image.open(imagename) 
+    im = Image.open(imagename)
     pix = im.load()
 
     width = im.size[0]
@@ -145,12 +148,12 @@ def encrypt(imagename, password):
     # break up the image into a list, each with pixel values and then append to a string
     for y in range(0, height):
         for x in range(0, width):
-            print(pix[x, y]) 
+            print(pix[x, y])
             plaintext.append(pix[x, y])
     print(width)
     print(height)
 
-    # add 100 to each tuple value to make sure each are 3 digits long.  
+    # add 100 to each tuple value to make sure each are 3 digits long.
     for i in range(0, len(plaintext)):
         for j in range(0, 3):
             aa = int(plaintext[i][j]) + 100
@@ -162,7 +165,7 @@ def encrypt(imagename, password):
     # append dimensions of image for reconstruction after decryption
     plaintextstr += "h" + str(height) + "h" + "w" + str(width) + "w"
 
-    # make sure that plantextstr length is a multiple of 16 for AES.  if not, append "n". 
+    # make sure that plantextstr length is a multiple of 16 for AES.  if not, append "n".
     while (len(plaintextstr) % 16 != 0):
         plaintextstr = plaintextstr + "n"
 
@@ -180,8 +183,19 @@ def encrypt(imagename, password):
     level_one_encrypt("visual_encrypt.jpeg")
     print("2-Share Encryption done.......")
 
+    end_time = time.time()  # Pencatatan waktu selesai
+    duration = end_time - start_time
+    print(f"Encryption process took {duration:.2f} seconds")
+    time_label.config(text=f"Encryption process took {duration:.2f} seconds")
+
+    # Update image info
+    num_pixels = width * height
+    image_info_label.config(text=f"Image Dimensions: {width}x{height} pixels\nTotal Pixels: {num_pixels}")
+
 # ---------------------- decryption ---------------------- #
-def decrypt(ciphername, password):
+def decrypt(ciphername, password, time_label, image_info_label):
+    start_time = time.time()  # Pencatatan waktu mulai
+
     secret_image = Image.open("secret.jpeg")
     ima = Image.open("2-share_encrypt.jpeg")
     new_image = generate_image_back(secret_image, ima)
@@ -219,6 +233,60 @@ def decrypt(ciphername, password):
     newim.putdata(finaltexttwo)
     newim.save("visual_decrypt.jpeg")
     print("Visual Decryption done......")
+
+    end_time = time.time()  # Pencatatan waktu selesai
+    duration = end_time - start_time
+    print(f"Decryption process took {duration:.2f} seconds")
+    time_label.config(text=f"Decryption process took {duration:.2f} seconds")
+
+    # Update image info
+    num_pixels = int(newwidth) * int(newheight)
+    image_info_label.config(text=f"Image Dimensions: {newwidth}x{newheight} pixels\nTotal Pixels: {num_pixels}")
+
+    start_time = time.time()  # Pencatatan waktu mulai
+
+    secret_image = Image.open("secret.jpeg")
+    ima = Image.open("2-share_encrypt.jpeg")
+    new_image = generate_image_back(secret_image, ima)
+    new_image.save("2-share_decrypt.jpeg")
+    print("2-share Decryption done....")
+    
+    with open(ciphername, 'rb') as cipher:
+        ciphertext = cipher.read()
+
+    # decrypt ciphertext with password
+    iv = 'This is an IV456'.encode()  # Ensure IV is bytes and has length of 16 bytes
+    obj2 = AES.new(password, AES.MODE_CBC, iv)
+    decrypted = obj2.decrypt(ciphertext).decode()
+
+    # parse the decrypted text back into integer string
+    decrypted = decrypted.replace("n", "")
+
+    # extract dimensions of images
+    newwidth = decrypted.split("w")[1]
+    newheight = decrypted.split("h")[1]
+
+    # replace height and width with emptyspace in decrypted plaintext
+    heightr = "h" + str(newheight) + "h"
+    widthr = "w" + str(newwidth) + "w"
+    decrypted = decrypted.replace(heightr, "")
+    decrypted = decrypted.replace(widthr, "")
+
+    # reconstruct the list of RGB tuples from the decrypted plaintext
+    step = 3
+    finaltextone = [decrypted[i:i+step] for i in range(0, len(decrypted), step)]
+    finaltexttwo = [(int(finaltextone[int(i)]) - 100, int(finaltextone[int(i+1)]) - 100, int(finaltextone[int(i+2)]) - 100) for i in range(0, len(finaltextone), step)]
+
+    # reconstruct image from list of pixel RGB tuples
+    newim = Image.new("RGB", (int(newwidth), int(newheight)))
+    newim.putdata(finaltexttwo)
+    newim.save("visual_decrypt.jpeg")
+    print("Visual Decryption done......")
+
+    end_time = time.time()  # Pencatatan waktu selesai
+    duration = end_time - start_time
+    print(f"Decryption process took {duration:.2f} seconds")
+    time_label.config(text=f"Decryption process took {duration:.2f} seconds")
 
 # ---------------------
 # GUI stuff starts here
@@ -278,10 +346,51 @@ class App:
         passg = Entry(master, show="*", width=20)
         passg.pack()
 
-        self.encrypt = Button(master, text="Encrypt", fg="black", command=image_open, width=25, height=5)
+        self.encrypt = Button(master, text="Encrypt", fg="black", command=self.image_open, width=25, height=5)
         self.encrypt.pack(side=LEFT)
-        self.decrypt = Button(master, text="Decrypt", fg="black", command=cipher_open, width=25, height=5)
+        self.decrypt = Button(master, text="Decrypt", fg="black", command=self.cipher_open, width=25, height=5)
         self.decrypt.pack(side=RIGHT)
+
+        # Label untuk menampilkan waktu proses
+        self.time_label = Label(master, text="")
+        self.time_label.pack()
+
+        # Label untuk menampilkan informasi gambar
+        self.image_info_label = Label(master, text="")
+        self.image_info_label.pack()
+
+    def pass_alert(self):
+       tkMessageBox.showinfo("Password Alert", "Please enter a password.")
+
+    def enc_success(self, imagename):
+       tkMessageBox.showinfo("Success", "Encrypted Image: " + imagename)
+
+    # image encrypt button event
+    def image_open(self):
+        global file_path_e
+
+        enc_pass = passg.get()
+        if enc_pass == "":
+            self.pass_alert()
+        else:
+            password = hashlib.sha256(enc_pass.encode()).digest()
+            filename = tkFileDialog.askopenfilename()
+            file_path_e = os.path.dirname(filename)
+            encrypt(filename, password, self.time_label, self.image_info_label)
+
+    # image decrypt button event
+    def cipher_open(self):
+        global file_path_d
+
+        dec_pass = passg.get()
+        if dec_pass == "":
+            self.pass_alert()
+        else:
+            password = hashlib.sha256(dec_pass.encode()).digest()
+            filename = tkFileDialog.askopenfilename()
+            file_path_d = os.path.dirname(filename)
+            decrypt(filename, password, self.time_label, self.image_info_label)
+
 
 # ------------------ MAIN -------------#
 root = Tk()
