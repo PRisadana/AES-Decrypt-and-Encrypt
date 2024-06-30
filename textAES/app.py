@@ -73,18 +73,18 @@ Label(root, text="Key:").grid(row=2, column=0, padx=10, pady=10)
 Label(root, text="Decrypted Text:").grid(row=3, column=0, padx=10, pady=10)
 
 # Entries untuk menerima input dari pengguna
-plaintext_entry = Entry(root)
+plaintext_entry = Entry(root, width=100)
 plaintext_entry.grid(row=0, column=1, padx=10, pady=10)
-ciphertext_entry = Entry(root)
+ciphertext_entry = Entry(root, width=100)
 ciphertext_entry.grid(row=1, column=1, padx=10, pady=10)
-key_entry = Entry(root)
+key_entry = Entry(root, width=100)
 key_entry.grid(row=2, column=1, padx=10, pady=10)
-decryptedtext_entry = Entry(root)
+decryptedtext_entry = Entry(root, width=100)
 decryptedtext_entry.grid(row=3, column=1, padx=10, pady=10)
 
 # Buttons untuk memicu enkripsi dan dekripsi
-Button(root, text="Encrypt", command=perform_encryption).grid(row=4, column=0, padx=10, pady=10)
-Button(root, text="Decrypt", command=perform_decryption).grid(row=4, column=1, padx=10, pady=10)
+Button(root, width=50, text="Encrypt", command=perform_encryption).grid(row=4, column=0, padx=10, pady=10)
+Button(root, width=50, text="Decrypt", command=perform_decryption).grid(row=4, column=1, padx=10, pady=10)
 
 # Menjalankan aplikasi Tkinter
 root.mainloop()
