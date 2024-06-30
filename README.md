@@ -8,7 +8,7 @@ Project ini mengimplementasikan teknik kriptografi untuk mengenkripsi dan mendek
 +-----------------------------------+------------+
 | Gede Reva Prasetya Paramarta      | 2205551015 |
 | Resandy Prisadana                 | 2205551050 |
-| I Nyoman Danu Daksawan Randysmara	| 2205551062 |
+| I Nyoman Danu Daksawan Randysmara | 2205551062 |
 | I Gede Teja Baskara               | 2205551065 |
 | I Putu Eka Putra Juniawan         | 2205551087 |
 +-----------------------------------+------------+
