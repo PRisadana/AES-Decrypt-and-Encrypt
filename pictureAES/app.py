@@ -42,6 +42,11 @@ def encrypt_image(image_path, key, output_path):
     encrypted_data = encrypt_data(image_bytes, key)
     with open(output_path, 'wb') as f:
         f.write(encrypted_data)
+    # Simpan ukuran gambar di file terpisah
+    with open(output_path + '.size', 'wb') as f:
+        width, height = image.size
+        f.write(width.to_bytes(4, 'big'))
+        f.write(height.to_bytes(4, 'big'))
     print(f"Encrypted image saved to: {output_path}")
 
 # Fungsi untuk mendekripsi gambar
@@ -51,9 +56,8 @@ def decrypt_image(encrypted_path, key, output_path):
         encrypted_data = f.read()
     print("Decrypting image data...")
     decrypted_data = decrypt_data(encrypted_data, key)
-    # Mendapatkan ukuran gambar dari file asli sebelum enkripsi
-    with open(encrypted_path, 'rb') as f:
-        f.seek(-8, os.SEEK_END)
+    # Membaca ukuran gambar dari file .size
+    with open(encrypted_path + '.size', 'rb') as f:
         size_bytes = f.read(8)
         width, height = int.from_bytes(size_bytes[:4], 'big'), int.from_bytes(size_bytes[4:], 'big')
     decrypted_image = bytes_to_image(decrypted_data, (width, height))
@@ -80,12 +84,7 @@ def perform_encryption():
     output_path = filedialog.asksaveasfilename(defaultextension=".aes", filetypes=[("Encrypted Files", "*.aes")])
     if output_path:
         image = load_image(image_path.get())
-        width, height = image.size
         encrypt_image(image_path.get(), key, output_path)
-        # Simpan ukuran gambar di akhir file terenkripsi
-        with open(output_path, 'ab') as f:
-            f.write(width.to_bytes(4, 'big'))
-            f.write(height.to_bytes(4, 'big'))
 
 def perform_decryption():
     if not encrypted_path.get() or not key_entry.get():
